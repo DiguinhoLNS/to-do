@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useRef, useState, useEffect } from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App:React.FC = () => {
+
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [list, setList] = useState<string[]>([])
+
+    const addTodo = () => {
+        setList([...list, inputRef.current!.value])
+        localStorage.setItem('todos', JSON.stringify([...list, inputRef.current!.value]))
+        inputRef.current!.value = ''
+    }
+
+    const removeTodo = (item: string) => {
+        const newTodos = list
+        newTodos.splice(newTodos.findIndex(data => data === item), 1)
+        localStorage.setItem('todos', JSON.stringify(newTodos))
+        setList([...newTodos]) 
+    }
+
+    useEffect(() => {
+        const lsTodos = localStorage.getItem('todos')
+        setList(lsTodos ? JSON.parse(lsTodos) : [])
+    }, [])
+  
+    return(
+
+        <>
+        
+            <input ref = {inputRef} type = "text" />
+            <button onClick = {addTodo}> Adicionar </button>
+
+            {list && list.map((data, index) => (
+                <div key = {index}>
+                    <h1> {data} </h1>
+                    <button onClick = {() => removeTodo(data)}> Remover </button>
+                </div>
+            ))}
+        
+        </>
+
+    )
+
 }
 
 export default App;
